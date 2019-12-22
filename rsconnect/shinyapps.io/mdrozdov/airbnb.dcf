@@ -1,0 +1,10 @@
+name: airbnb
+title:
+username:
+account: mdrozdov
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1615593
+bundleId: 2686006
+url: https://mdrozdov.shinyapps.io/airbnb/
+when: 1576990539.09677
