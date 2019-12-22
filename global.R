@@ -4,8 +4,6 @@ library(shiny)
 library(leaflet)
 library(RColorBrewer)
 
-
-
 bnb = read.csv('./AB_NYC_2019.csv')
 
 bnb = bnb %>% mutate(p_radius = ifelse(price <= 100, 1,

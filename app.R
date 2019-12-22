@@ -30,14 +30,14 @@ ui = navbarPage("NYC AirBnB", id="nav",
                         leafletOutput("map", width="100%", height="100%"))),
            
            absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-                         draggable = TRUE, top = 60, left = "auto", right = 20, bottom = "auto",
-                         width = 400, height = "auto",
+                         draggable = TRUE, top = 60, left = "auto", right = 1220, bottom = "auto",
+                         width = 800, height = "auto",
                          
-                         h2("NYC AirBnB Explorer"),
+                         h4("NYC AirBnB Explorer"),
                          
-                         selectInput("color", "Color", vars, selected = 'price'),
-                         selectInput("size", "Size", vars2, selected = 'none'),
-                         plotOutput("p_hist", height = 250, width = 350)
+                         selectInput("color", "Color", vars, selected = 'price', width = 'auto'),
+                         selectInput("size", "Size", vars2, selected = 'price', width = 'auto'),
+                         plotOutput("p_hist", height = 200, width = 750)
                          ))
            
                         
@@ -86,29 +86,33 @@ server = function(input, output, session) {
             radius = bnbdat$b_radius
             
         } else if(sizeBy == 'none') {
-            radius = 2
+            radius = 1
         }
         
         
         leafletProxy("map", data = bnbdat) %>%
             clearMarkers() %>%
-            addCircleMarkers(~longitude, ~latitude, radius=radius,fillOpacity = 2, 
+            addCircleMarkers(~longitude, ~latitude, radius=radius,fillOpacity = 0.65, 
                              fillColor = ~pal(bnbdat[,colorBy]), stroke = FALSE,
                              label = ~paste(paste0('Price: ','$',as.character(price)),
                                              paste('Neighborhood: ', as.character(neighbourhood)),
                                              paste('Minimum Nights: ', as.character(minimum_nights)),
                                              paste('Room Type: ', as.character(room_type)), sep = ' / '))
-        
-        p_hist = ggplot() + geom_density(aes(x=bnbdat[,colorBy]), fill = '#00DD00') + ggtitle(paste0('Distribution of ',colorBy)) + xlab(colorBy) + ylab('Density')
-        output$p_hist = renderPlot({p_hist})
+    
+        if(colorBy != 'neighbourhood'){
+            p_hist = ggplot() + geom_density(aes(x=bnbdat[,colorBy]), fill = '#00DD00') + ggtitle(paste0('Distribution of ',colorBy)) + xlab(colorBy) + ylab('Density')
+        } else {
+            p_hist = ggplot(data=bnbdat) + geom_density(aes(x=neighbourhood), fill = '#00DD00') + facet_wrap(~neighbourhood_group) + 
+                ylim(0,0.3) +
+                ggtitle(paste0('Density per ',colorBy,'/borough')) + xlab(colorBy) + ylab('Density') + theme(axis.text.x = element_blank())
+        }
+            
+            output$p_hist = renderPlot({p_hist})
         
     })
     
     output$map = renderLeaflet({map})
     
-    
-        
-        
         
 }
 
